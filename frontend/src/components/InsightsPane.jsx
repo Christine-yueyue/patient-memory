@@ -4,8 +4,8 @@ const InsightsPane = ({ insights }) => {
   return (
     <div className="pane insights-pane">
       <div className="pane-heading">
-        <p className="pane-kicker">AI assist</p>
-        <h2>Insights</h2>
+        <p className="pane-kicker">ContinuCare Assistant</p>
+        <h2>Clinical Insights</h2>
       </div>
       <div className="insights-list">
         {insights.map((insight, index) => (

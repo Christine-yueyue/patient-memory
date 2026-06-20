@@ -7,6 +7,15 @@ class Task(BaseModel):
     due: str
     source: str
     status: str = "pending"
+    assignee: str = "doctor"  # "doctor" or "patient"
+
+
+class Prescription(BaseModel):
+    medication: str
+    dose: str
+    frequency: str
+    duration: str
+    instructions: str = ""
 
 
 class BillingCode(BaseModel):
@@ -28,17 +37,21 @@ class PatientWiki(BaseModel):
 
 class ProcessVisitRequest(BaseModel):
     transcript: str
-    patient_names: list[str] = []   # used for de-identification
+    patient_names: list[str] = []
     patient_wiki: Optional[PatientWiki] = None
     patient_session_id: str
 
 
 class ProcessVisitResponse(BaseModel):
-    note: str
+    note: str                          # SOAP format plain text
+    prescriptions: list[Prescription] = []
     billing: list[BillingCode]
     tasks: list[Task]
+    checklist: list[str] = []          # end-of-visit checklist items
+    patient_reminders: list[str] = []
+    doctor_reminders: list[str] = []
     patient_summary: str = ""
     insights: list[str] = []
     wiki_update: PatientWiki
-    deidentified_transcript: str    # what was actually sent to the model
-    replacement_map: dict           # token to real value, for re-id on frontend
+    deidentified_transcript: str
+    replacement_map: dict

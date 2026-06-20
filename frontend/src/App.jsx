@@ -7,6 +7,9 @@ import PatientSummaryPane from './components/PatientSummaryPane';
 import InsightsPane from './components/InsightsPane';
 import MemoryTimelinePane from './components/MemoryTimelinePane';
 import PatientMemoryPane from './components/PatientMemoryPane';
+import PrescriptionsPane from './components/PrescriptionsPane';
+import RemindersPane from './components/RemindersPane';
+import ChecklistPane from './components/ChecklistPane';
 import {
   loadPatientMemory,
   savePatientMemory,
@@ -37,6 +40,13 @@ function IntroCard() {
   );
 }
 
+function calcAge(dob) {
+  if (!dob) return null;
+  const diff = Date.now() - new Date(dob).getTime();
+  const age = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+  return isNaN(age) || age < 0 ? null : age;
+}
+
 function App() {
   const [transcript, setTranscript] = useState('');
   const [deidMap, setDeidMap] = useState({});
@@ -51,6 +61,13 @@ function App() {
   const [visitRenderKey, setVisitRenderKey] = useState(0);
   const [patientId] = useState(PATIENT_ID);
 
+  // Patient demographics — stored locally, never sent to AI
+  const [patientName, setPatientName] = useState('Martha Collins');
+  const [patientDOB, setPatientDOB] = useState('1966-01-15');
+  const [patientIdNum, setPatientIdNum] = useState('HC-4823917650');
+  const [editingDemo, setEditingDemo] = useState(false);
+
+  const patientAge = calcAge(patientDOB);
   const deidEntries = Object.entries(deidMap);
   const hasResult = Boolean(result);
 
@@ -139,10 +156,8 @@ function App() {
   };
 
   const heroCards = [
-    { label: 'Patient', value: patientId },
-    { label: 'Visit', value: `#${visitCount + 1}` },
-    { label: 'Memory', value: visitTimeline.length ? `${visitTimeline.length} visits` : 'Empty' },
-    { label: 'De-id tokens', value: `${deidEntries.length}` },
+    { label: 'Current visit', value: `#${visitCount + 1}` },
+    { label: 'Visit history', value: visitTimeline.length ? `${visitTimeline.length} prior visits` : 'New patient' },
   ];
 
   const patientSummaryText = result?.patient_summary || '';
@@ -163,53 +178,58 @@ function App() {
 
   return (
     <div className="app-shell">
-      <header className="hero">
-        <div className="hero-copy">
-          <p className="eyebrow">Clinical workflow</p>
-          <h1>ContinuCare AI</h1>
-          <p className="hero-subtitle">
-            Close the visit, preserve the context, and carry the patient story forward.
-          </p>
+      <nav className="topbar">
+        <div className="topbar-brand">
+          <span className="topbar-logo">⚕</span>
+          <span className="topbar-name">ContinuCare Assistant</span>
         </div>
+        <span className="topbar-tag">Ontario Primary Care</span>
+      </nav>
 
-        <div className="hero-metrics">
-          {heroCards.map((card) => (
-            <div key={card.label} className="metric-card">
-              <span className="metric-label">{card.label}</span>
-              <strong className="metric-value">{card.value}</strong>
+      <header className="patient-banner-bar">
+
+        <div className="patient-card">
+          {editingDemo ? (
+            <div className="patient-demo-edit">
+              <label>Name<input value={patientName} onChange={e => setPatientName(e.target.value)} /></label>
+              <label>Date of Birth<input type="date" value={patientDOB} onChange={e => setPatientDOB(e.target.value)} /></label>
+              <label>Patient ID<input value={patientIdNum} onChange={e => setPatientIdNum(e.target.value)} /></label>
+              <button className="btn-edit-demo" onClick={() => setEditingDemo(false)}>Done</button>
             </div>
-          ))}
-        </div>
-
-        <div className="visit-info">
-          Live session
-          {patientWiki && <span className="memory-pill">Memory loaded</span>}
+          ) : (
+            <>
+              <div className="patient-banner-name">
+                {patientName || '—'}
+                <button className="btn-edit-demo" onClick={() => setEditingDemo(true)}>Edit</button>
+              </div>
+              <div className="patient-banner-meta">
+                <span><strong>DOB</strong> {patientDOB ? new Date(patientDOB + 'T00:00:00').toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' }) : '—'}</span>
+                {patientAge && <span><strong>Age</strong> {patientAge}</span>}
+                <span><strong>ID</strong> {patientIdNum || '—'}</span>
+                <span className="patient-visit-badge">Visit #{visitCount + 1}{visitTimeline.length > 0 ? ` · ${visitTimeline.length} prior` : ' · New patient'}</span>
+              </div>
+              {(patientWiki?.conditions?.length > 0 || patientWiki?.medications?.length > 0) && (
+                <div className="patient-banner-clinical">
+                  {patientWiki?.conditions?.length > 0 && (
+                    <span className="banner-clinical-row"><strong>Conditions</strong> {patientWiki.conditions.join(' · ')}</span>
+                  )}
+                  {patientWiki?.medications?.length > 0 && (
+                    <span className="banner-clinical-row"><strong>Medications</strong> {patientWiki.medications.join(' · ')}</span>
+                  )}
+                </div>
+              )}
+            </>
+          )}
         </div>
       </header>
 
       <div className="main-content">
+
         <div className="left-panel">
           <TranscriptInput
             onProcess={handleProcessVisit}
             onTranscriptChange={setTranscript}
           />
-
-          {transcript && deidEntries.length > 0 && (
-            <div className="deid-visualization">
-              <div className="pane-kicker">De-identification preview</div>
-              <h3>This is what leaves your device</h3>
-              <div className="deid-details">
-                <span className="deid-count">
-                  {deidEntries.length} tokens replaced
-                </span>
-                {deidEntries.map(([token]) => (
-                  <span key={token} className="token-tag">
-                    {token}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
         <div className="right-panel">
@@ -218,21 +238,25 @@ function App() {
               <PatientSummaryPane
                 patientSummary={result.patient_summary}
                 tasks={result.tasks}
-                insights={result.insights}
+                patientReminders={result.patient_reminders}
                 onCopy={handleCopySummary}
               />
-              <InsightsPane insights={result.insights} />
+              <PrescriptionsPane prescriptions={result.prescriptions} />
+              <RemindersPane
+                patientReminders={result.patient_reminders}
+                doctorReminders={result.doctor_reminders}
+              />
+              <ChecklistPane
+                key={`checklist-${visitRenderKey}`}
+                checklist={result.checklist}
+                tasks={result.tasks}
+              />
               <NotePane key={`note-${visitRenderKey}`} note={result.note} />
               <BillingPane
                 key={`billing-${visitRenderKey}`}
                 billingItems={result.billing}
               />
-              <TasksPane
-                key={`tasks-${visitRenderKey}`}
-                tasks={result.tasks}
-                onTaskUpdate={handleTaskUpdate}
-                onTaskDelete={handleTaskDelete}
-              />
+              <InsightsPane insights={result.insights} />
               <MemoryTimelinePane timeline={visitTimeline} />
               <PatientMemoryPane wiki={patientWiki} />
             </>

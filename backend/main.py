@@ -9,14 +9,14 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
-from models import ProcessVisitRequest, ProcessVisitResponse, PatientWiki, BillingCode, Task
+from models import ProcessVisitRequest, ProcessVisitResponse, PatientWiki, BillingCode, Task, Prescription
 from deidentify import deidentify
 from prompts import SYSTEM_PROMPT, build_user_message
 
 load_dotenv()
 
 limiter = Limiter(key_func=get_remote_address)
-app = FastAPI(title="ContinuCare AI API", version="1.0.0")
+app = FastAPI(title="ContinuCare Assistant API", version="1.0.0")
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
@@ -48,7 +48,7 @@ async def process_visit(request: Request, req: ProcessVisitRequest):
     clean_transcript = deid_result["clean"]
     replacement_map = deid_result["map"]
 
-    # 2. Build the prompt - inject patient wiki if this is a return visit
+    # 2. Build prompt — inject patient wiki if return visit
     user_message = build_user_message(clean_transcript, req.patient_wiki)
 
     # 3. Call NVIDIA NIM (OpenAI-compatible)
@@ -59,7 +59,7 @@ async def process_visit(request: Request, req: ProcessVisitRequest):
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": user_message},
             ],
-            max_tokens=2000,
+            max_tokens=2500,
             temperature=0.2,
         )
     except Exception as e:
@@ -67,7 +67,7 @@ async def process_visit(request: Request, req: ProcessVisitRequest):
 
     raw = response.choices[0].message.content.strip()
 
-    # 4. Strip accidental markdown fences if model adds them
+    # 4. Strip accidental markdown fences
     raw = re.sub(r"^```(?:json)?\s*", "", raw)
     raw = re.sub(r"\s*```$", "", raw)
 
@@ -82,8 +82,12 @@ async def process_visit(request: Request, req: ProcessVisitRequest):
 
     # 6. Build typed response
     try:
+        prescriptions = [Prescription(**p) for p in data.get("prescriptions", [])]
         billing = [BillingCode(**b) for b in data.get("billing", [])]
         tasks = [Task(**t) for t in data.get("tasks", [])]
+        checklist = data.get("checklist", [])
+        patient_reminders = data.get("patient_reminders", [])
+        doctor_reminders = data.get("doctor_reminders", [])
         patient_summary = data.get("patient_summary", "")
         insights = data.get("insights", [])
         wiki_raw = data.get("wiki_update", {})
@@ -101,14 +105,19 @@ async def process_visit(request: Request, req: ProcessVisitRequest):
 
     return ProcessVisitResponse(
         note=data.get("note", ""),
+        prescriptions=prescriptions,
         billing=billing,
         tasks=tasks,
+        checklist=checklist,
+        patient_reminders=patient_reminders,
+        doctor_reminders=doctor_reminders,
         patient_summary=patient_summary,
         insights=insights,
         wiki_update=wiki_update,
         deidentified_transcript=clean_transcript,
         replacement_map=replacement_map,
     )
+
 
 if __name__ == "__main__":
     import uvicorn
