@@ -37,6 +37,8 @@ class ProcessVisitResponse(BaseModel):
     note: str
     billing: list[BillingCode]
     tasks: list[Task]
+    patient_summary: str = ""
+    insights: list[str] = []
     wiki_update: PatientWiki
-    deidentified_transcript: str    # what was actually sent to Claude
-    replacement_map: dict           # token → real value, for re-id on frontend
+    deidentified_transcript: str    # what was actually sent to the model
+    replacement_map: dict           # token to real value, for re-id on frontend

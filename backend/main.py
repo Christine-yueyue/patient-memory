@@ -16,7 +16,7 @@ from prompts import SYSTEM_PROMPT, build_user_message
 load_dotenv()
 
 limiter = Limiter(key_func=get_remote_address)
-app = FastAPI(title="Patient Memory API", version="1.0.0")
+app = FastAPI(title="ContinuCare AI API", version="1.0.0")
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
@@ -48,7 +48,7 @@ async def process_visit(request: Request, req: ProcessVisitRequest):
     clean_transcript = deid_result["clean"]
     replacement_map = deid_result["map"]
 
-    # 2. Build the prompt — inject patient wiki if this is a return visit
+    # 2. Build the prompt - inject patient wiki if this is a return visit
     user_message = build_user_message(clean_transcript, req.patient_wiki)
 
     # 3. Call NVIDIA NIM (OpenAI-compatible)
@@ -84,6 +84,8 @@ async def process_visit(request: Request, req: ProcessVisitRequest):
     try:
         billing = [BillingCode(**b) for b in data.get("billing", [])]
         tasks = [Task(**t) for t in data.get("tasks", [])]
+        patient_summary = data.get("patient_summary", "")
+        insights = data.get("insights", [])
         wiki_raw = data.get("wiki_update", {})
         wiki_pending = [Task(**t) for t in wiki_raw.get("pending_tasks", [])]
         wiki_update = PatientWiki(
@@ -101,7 +103,17 @@ async def process_visit(request: Request, req: ProcessVisitRequest):
         note=data.get("note", ""),
         billing=billing,
         tasks=tasks,
+        patient_summary=patient_summary,
+        insights=insights,
         wiki_update=wiki_update,
         deidentified_transcript=clean_transcript,
         replacement_map=replacement_map,
+    )
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        app,
+        host=os.getenv("HOST", "0.0.0.0"),
+        port=int(os.getenv("PORT", 3001))
     )
