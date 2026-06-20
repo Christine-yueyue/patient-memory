@@ -64,6 +64,24 @@ function App() {
   const [patientDOB, setPatientDOB] = useState('1966-01-15');
   const [patientIdNum, setPatientIdNum] = useState('HC-4823917650');
   const [editingDemo, setEditingDemo] = useState(false);
+  const [demoSnapshot, setDemoSnapshot] = useState(null);
+
+  function startEditing() {
+    setDemoSnapshot({ patientName, patientDOB, patientIdNum });
+    setEditingDemo(true);
+  }
+  function cancelEditing() {
+    if (demoSnapshot) {
+      setPatientName(demoSnapshot.patientName);
+      setPatientDOB(demoSnapshot.patientDOB);
+      setPatientIdNum(demoSnapshot.patientIdNum);
+    }
+    setEditingDemo(false);
+  }
+  function doneEditing() {
+    setDemoSnapshot(null);
+    setEditingDemo(false);
+  }
 
   const patientAge = calcAge(patientDOB);
   const deidEntries = Object.entries(deidMap);
@@ -187,13 +205,16 @@ function App() {
               <label>Name<input value={patientName} onChange={e => setPatientName(e.target.value)} /></label>
               <label>Date of Birth<input type="date" value={patientDOB} onChange={e => setPatientDOB(e.target.value)} /></label>
               <label>Patient ID<input value={patientIdNum} onChange={e => setPatientIdNum(e.target.value)} /></label>
-              <button className="btn-edit-demo" onClick={() => setEditingDemo(false)}>Done</button>
+              <div className="demo-edit-actions">
+                <button className="review-button" onClick={doneEditing}>Done</button>
+                <button className="review-button muted" onClick={cancelEditing}>Cancel</button>
+              </div>
             </div>
           ) : (
             <>
               <div className="patient-banner-name">
                 {patientName || '—'}
-                <button className="btn-edit-demo" onClick={() => setEditingDemo(true)}>Edit</button>
+                <button className="btn-edit-demo" onClick={startEditing}>Edit</button>
               </div>
               <div className="patient-banner-meta">
                 <span><strong>DOB</strong> {patientDOB ? new Date(patientDOB + 'T00:00:00').toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' }) : '—'}</span>

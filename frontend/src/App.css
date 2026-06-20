@@ -165,6 +165,7 @@
   background: #fff;
   min-width: 130px;
 }
+.demo-edit-actions { display: flex; gap: 8px; align-items: center; padding-top: 4px; }
 
 .metric-card {
   padding: 16px 18px;
