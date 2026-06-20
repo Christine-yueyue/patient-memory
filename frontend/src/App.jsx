@@ -9,7 +9,6 @@ import MemoryTimelinePane from './components/MemoryTimelinePane';
 import PatientMemoryPane from './components/PatientMemoryPane';
 import PrescriptionsPane from './components/PrescriptionsPane';
 import RemindersPane from './components/RemindersPane';
-import ChecklistPane from './components/ChecklistPane';
 import {
   loadPatientMemory,
   savePatientMemory,
@@ -239,11 +238,6 @@ function App() {
               <RemindersPane
                 patientReminders={result.patient_reminders}
                 doctorReminders={result.doctor_reminders}
-              />
-              <ChecklistPane
-                key={`checklist-${visitRenderKey}`}
-                checklist={result.checklist}
-                tasks={result.tasks}
               />
               <NotePane key={`note-${visitRenderKey}`} note={result.note} />
               <BillingPane
