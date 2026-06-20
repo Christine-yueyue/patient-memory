@@ -5,7 +5,6 @@ const RemindersPane = ({ patientReminders, doctorReminders }) => {
   return (
     <div className="pane reminders-pane">
       <div className="pane-heading">
-        <p className="pane-kicker">ContinuCare Assistant</p>
         <h2>Reminders</h2>
       </div>
       <div className="reminders-grid">

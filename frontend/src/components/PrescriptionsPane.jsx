@@ -4,7 +4,6 @@ const PrescriptionsPane = ({ prescriptions }) => {
   return (
     <div className="pane prescriptions-pane">
       <div className="pane-heading">
-        <p className="pane-kicker">ContinuCare Assistant</p>
         <h2>Prescriptions</h2>
       </div>
       <p className="pane-note">Review before issuing. Clinician signature required.</p>

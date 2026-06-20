@@ -30,8 +30,7 @@ const PatientMemoryPane = ({ wiki }) => {
   return (
     <div className="pane memory-pane">
       <div className="pane-heading">
-        <p className="pane-kicker">Patient context</p>
-        <h2>ContinuCare Memory</h2>
+        <h2>Patient Summary</h2>
       </div>
       <div className="memory-content">
         {sections.map((section) => (

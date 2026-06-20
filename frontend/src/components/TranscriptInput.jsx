@@ -63,7 +63,6 @@ const TranscriptInput = ({ onProcess, onTranscriptChange }) => {
   return (
     <div className="transcript-input-section pane">
       <div className="pane-heading">
-        <p className="pane-kicker">Visit input</p>
         <h2>Visit Transcript</h2>
       </div>
 

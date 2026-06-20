@@ -27,7 +27,6 @@ const NotePane = ({ note }) => {
     <div className="pane note-pane">
       <div className="pane-heading review-header">
         <div>
-          <p className="pane-kicker">ContinuCare Assistant</p>
           <h2>Clinical Note (SOAP)</h2>
         </div>
         <div className="header-actions">

@@ -23,7 +23,6 @@ const PATIENT_ID = 'pt-a1b2c3';
 function IntroCard() {
   return (
     <div className="placeholder pane">
-      <p className="pane-kicker">Workspace preview</p>
       <h2>From transcript to care continuity</h2>
       <p>
         Select a sample visit or paste your own de-identified transcript to
@@ -154,11 +153,6 @@ function App() {
       tasks: updatedTasks,
     }));
   };
-
-  const heroCards = [
-    { label: 'Current visit', value: `#${visitCount + 1}` },
-    { label: 'Visit history', value: visitTimeline.length ? `${visitTimeline.length} prior visits` : 'New patient' },
-  ];
 
   const patientSummaryText = result?.patient_summary || '';
   const patientShareText = [

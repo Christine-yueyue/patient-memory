@@ -20,7 +20,6 @@ const BillingPane = ({ billingItems }) => {
     return (
       <div className="pane billing-pane">
         <div className="pane-heading">
-          <p className="pane-kicker">Revenue cycle</p>
           <h2>Suggested Billing Codes</h2>
         </div>
         <p className="empty-state">No billing codes suggested.</p>
@@ -44,7 +43,6 @@ const BillingPane = ({ billingItems }) => {
     <div className="pane billing-pane">
       <div className="pane-heading review-header">
         <div>
-          <p className="pane-kicker">Revenue cycle</p>
           <h2>Suggested Billing Codes</h2>
         </div>
         <div className="status-pill pending">Doctor review</div>

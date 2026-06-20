@@ -34,7 +34,6 @@ const PatientSummaryPane = ({ patientSummary, tasks, patientReminders, onCopy })
     <div className="pane summary-pane">
       <div className="pane-heading review-header">
         <div>
-          <p className="pane-kicker">ContinuCare Assistant</p>
           <h2>Plain-Language Summary</h2>
         </div>
         <button className="review-button" onClick={handleCopy}>

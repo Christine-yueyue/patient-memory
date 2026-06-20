@@ -4,8 +4,7 @@ const MemoryTimelinePane = ({ timeline }) => {
   return (
     <div className="pane timeline-pane">
       <div className="pane-heading">
-        <p className="pane-kicker">Memory retention</p>
-        <h2>Visit Timeline</h2>
+        <h2>Visit History</h2>
       </div>
       <div className="timeline-list">
         {timeline.slice().reverse().map((visit) => (

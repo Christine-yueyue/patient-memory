@@ -27,7 +27,6 @@ const TasksPane = ({ tasks, onTaskUpdate, onTaskDelete }) => {
     return (
       <div className="pane tasks-pane">
         <div className="pane-heading">
-          <p className="pane-kicker">Care coordination</p>
           <h2>Follow-up Tasks</h2>
         </div>
         <p className="empty-state">No follow-up tasks suggested.</p>
@@ -123,7 +122,6 @@ const TasksPane = ({ tasks, onTaskUpdate, onTaskDelete }) => {
     <div className="pane tasks-pane">
       <div className="pane-heading review-header">
         <div>
-          <p className="pane-kicker">Care coordination</p>
           <h2>Follow-up Tasks</h2>
         </div>
         <div className="status-pill pending">Doctor review</div>

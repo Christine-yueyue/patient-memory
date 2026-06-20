@@ -24,7 +24,6 @@ const ChecklistPane = ({ checklist, tasks }) => {
     <div className="pane checklist-pane">
       <div className="pane-heading review-header">
         <div>
-          <p className="pane-kicker">Care coordination</p>
           <h2>Visit Checklist</h2>
         </div>
         <span className="hint">{doneCount}/{allItems.length} complete</span>
