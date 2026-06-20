@@ -1,30 +1,33 @@
 import { useState } from 'react';
 
+const defaultHandoutText = (patientSummary, patientTasks, patientReminders) => [
+  'What we discussed today:',
+  patientSummary || '',
+  '',
+  'Your next steps:',
+  ...(patientTasks || []).map(t => `• ${t.task} — ${t.due}`),
+  '',
+  ...(patientReminders?.length ? ['Reminders:', ...(patientReminders || []).map(r => `• ${r}`), ''] : []),
+  'Lifestyle recommendations:',
+  '• Reduce sodium to less than 2,300 mg per day',
+  '• Aim for 30 minutes of moderate exercise most days',
+  '• Monitor your blood pressure at home when possible',
+  '• Take medications at the same time each day',
+  '• Follow up promptly if symptoms worsen',
+].join('\n');
+
 const PatientSummaryPane = ({ patientSummary, tasks, patientReminders, onCopy }) => {
   const [handoutState, setHandoutState] = useState('idle'); // idle | confirm | shown
+  const [handoutContent, setHandoutContent] = useState('');
 
   if (!patientSummary && (!tasks || tasks.length === 0)) return null;
 
   const patientTasks = (tasks || []).filter(t => t.assignee === 'patient' || !t.assignee);
 
-  const handoutText = [
-    'PATIENT HANDOUT',
-    '',
-    'What we discussed today:',
-    patientSummary || '',
-    '',
-    'Your next steps:',
-    ...patientTasks.map(t => `• ${t.task} — ${t.due}`),
-    '',
-    patientReminders?.length ? 'Reminders:' : '',
-    ...(patientReminders || []).map(r => `• ${r}`),
-    '',
-    'Lifestyle recommendations:',
-    '• Reduce sodium intake to less than 2,300 mg per day',
-    '• Aim for 30 minutes of moderate exercise most days',
-    '• Monitor blood pressure at home if possible',
-    '• Maintain a consistent medication schedule',
-  ].filter(line => line !== undefined).join('\n');
+  function openHandout() {
+    setHandoutContent(defaultHandoutText(patientSummary, patientTasks, patientReminders));
+    setHandoutState('shown');
+  }
 
   async function handleCopy() {
     if (onCopy) await onCopy();
@@ -63,14 +66,10 @@ const PatientSummaryPane = ({ patientSummary, tasks, patientReminders, onCopy })
 
         {handoutState === 'confirm' && (
           <div className="handout-confirm">
-            <p>Generate a plain-language handout with next steps and lifestyle recommendations?</p>
+            <p>Generate an editable patient handout with next steps and lifestyle recommendations?</p>
             <div className="handout-confirm-actions">
-              <button className="review-button" onClick={() => setHandoutState('shown')}>
-                Yes, generate
-              </button>
-              <button className="review-button muted" onClick={() => setHandoutState('idle')}>
-                Cancel
-              </button>
+              <button className="review-button" onClick={openHandout}>Yes, generate</button>
+              <button className="review-button muted" onClick={() => setHandoutState('idle')}>Cancel</button>
             </div>
           </div>
         )}
@@ -78,51 +77,29 @@ const PatientSummaryPane = ({ patientSummary, tasks, patientReminders, onCopy })
         {handoutState === 'shown' && (
           <div className="handout-body">
             <div className="handout-header-row">
-              <h3>Patient Handout</h3>
-              <button
-                className="review-button muted"
-                onClick={() => { navigator.clipboard.writeText(handoutText); }}
-              >
-                Copy handout
-              </button>
-            </div>
-            <div className="handout-content">
-              <div className="handout-block">
-                <h4>What we discussed today</h4>
-                <p>{patientSummary}</p>
-              </div>
-
-              {patientTasks.length > 0 && (
-                <div className="handout-block">
-                  <h4>Your next steps</h4>
-                  <ul className="handout-list">
-                    {patientTasks.map((t, i) => (
-                      <li key={i}>{t.task} <span className="task-due-inline">— {t.due}</span></li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {patientReminders?.length > 0 && (
-                <div className="handout-block">
-                  <h4>Reminders</h4>
-                  <ul className="handout-list">
-                    {patientReminders.map((r, i) => <li key={i}>{r}</li>)}
-                  </ul>
-                </div>
-              )}
-
-              <div className="handout-block">
-                <h4>Lifestyle Recommendations</h4>
-                <ul className="handout-list">
-                  <li>Reduce sodium to less than 2,300 mg per day</li>
-                  <li>Aim for 30 minutes of moderate exercise most days</li>
-                  <li>Monitor your blood pressure at home when possible</li>
-                  <li>Take medications at the same time each day</li>
-                  <li>Follow up promptly if symptoms worsen</li>
-                </ul>
+              <h3>Patient Handout <span className="handout-edit-hint">— editable</span></h3>
+              <div className="handout-actions">
+                <button
+                  className="review-button"
+                  onClick={() => navigator.clipboard.writeText(handoutContent)}
+                >
+                  Copy
+                </button>
+                <button
+                  className="review-button muted"
+                  onClick={() => setHandoutState('idle')}
+                >
+                  ← Back
+                </button>
               </div>
             </div>
+            <textarea
+              className="handout-editor"
+              value={handoutContent}
+              onChange={e => setHandoutContent(e.target.value)}
+              rows={18}
+              spellCheck={false}
+            />
           </div>
         )}
       </div>
