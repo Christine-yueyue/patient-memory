@@ -28,11 +28,11 @@ app.add_middleware(
 )
 
 client = OpenAI(
-    base_url="https://integrate.api.nvidia.com/v1",
-    api_key=os.getenv("NVIDIA_API_KEY"),
+    base_url="https://opencode.ai/zen/v1",
+    api_key=os.getenv("OPENCODE_API_KEY"),
 )
 
-MODEL = os.getenv("NVIDIA_MODEL", "meta/llama-3.1-70b-instruct")
+MODEL = "opencode-deepseek-v4-flash-free"
 
 
 @app.get("/health")
