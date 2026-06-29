@@ -5,8 +5,8 @@ import BillingPane from './components/BillingPane';
 import TasksPane from './components/TasksPane';
 import PatientSummaryPane from './components/PatientSummaryPane';
 import InsightsPane from './components/InsightsPane';
-import MemoryTimelinePane from './components/MemoryTimelinePane';
-import PatientMemoryPane from './components/PatientMemoryPane';
+import VisitTimelinePane from './components/VisitTimelinePane';
+import PatientStoryPane from './components/PatientStoryPane';
 import PrescriptionsPane from './components/PrescriptionsPane';
 import RemindersPane from './components/RemindersPane';
 import {
@@ -266,8 +266,8 @@ function App() {
                 billingItems={result.billing}
               />
               <InsightsPane insights={result.insights} />
-              <MemoryTimelinePane timeline={visitTimeline} />
-              <PatientMemoryPane wiki={patientWiki} />
+              <VisitTimelinePane timeline={visitTimeline} />
+              <PatientStoryPane wiki={patientWiki} />
             </>
           ) : (
             <IntroCard />

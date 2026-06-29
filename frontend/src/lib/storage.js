@@ -1,8 +1,8 @@
 // LocalStorage-based patient memory management
 // Stores patient data in browser memory only - nothing sent to server
 
-const STORAGE_KEY = 'patientMemoryDemo';
-const TIMELINE_KEY = 'patientMemoryTimelineDemo';
+const STORAGE_KEY = 'continuCareMemory';
+const TIMELINE_KEY = 'continuCareTimeline';
 
 /**
  * Save patient memory to localStorage

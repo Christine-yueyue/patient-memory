@@ -1,0 +1,23 @@
+# Developer guide (internal event doc, not for public repo)
+Developer Guide - June 20th AI in Healthcare Event.md
+
+# Backend
+backend/__pycache__/
+backend/.env
+*.pyc
+__pycache__/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
