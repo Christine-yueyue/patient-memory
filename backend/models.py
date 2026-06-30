@@ -35,6 +35,58 @@ class PatientWiki(BaseModel):
     history: str = ""
 
 
+class EMRCondition(BaseModel):
+    code: str = ""
+    name: str
+    onset: str = ""
+    status: str = "active"
+
+class EMRMedication(BaseModel):
+    name: str
+    start: str = ""
+    end: str | None = None
+    status: str = "active"
+    reason: str = ""
+
+class EMREncounter(BaseModel):
+    date: str
+    reason: str = ""
+
+class EMRLab(BaseModel):
+    test: str
+    date: str = ""
+    value: str = ""
+    unit: str = ""
+
+class EMRImmunization(BaseModel):
+    vaccine: str
+    date: str = ""
+
+class CareGap(BaseModel):
+    gap: str
+    due: str | None = None
+    status: str = "pending"
+    detail: str = ""
+
+class EMRPatientData(BaseModel):
+    id: str
+    name: str
+    dob: str = ""
+    gender: str = ""
+    conditions: list[EMRCondition] = []
+    medications: list[EMRMedication] = []
+    encounters: list[EMREncounter] = []
+    labs: list[EMRLab] = []
+    immunizations: list[EMRImmunization] = []
+    careGaps: list[CareGap] = []
+
+class LoadEMRResponse(BaseModel):
+    patient_id: str
+    patient_name: str
+    patient_story: str
+    care_gaps: list[CareGap]
+    wiki_update: PatientWiki
+
 class ProcessVisitRequest(BaseModel):
     transcript: str
     patient_names: list[str] = []

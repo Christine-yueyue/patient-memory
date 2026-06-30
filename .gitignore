@@ -4,6 +4,7 @@ Developer Guide - June 20th AI in Healthcare Event.md
 # Backend
 backend/__pycache__/
 backend/.env
+backend/venv/
 *.pyc
 __pycache__/
 

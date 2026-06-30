@@ -1,0 +1,41 @@
+{
+  "id": "pt-g7h8i9",
+  "name": "Sarah Chen",
+  "dob": "1990-04-03",
+  "gender": "female",
+  "conditions": [
+    { "code": "J45.40", "name": "Mild Persistent Asthma", "onset": "1998-06-01", "status": "active" },
+    { "code": "Z34.00", "name": "Pregnancy (first trimester)", "onset": "2025-09-15", "status": "active" },
+    { "code": "D50.9", "name": "Iron Deficiency Anemia", "onset": "2025-10-20", "status": "active" }
+  ],
+  "medications": [
+    { "name": "Salbutamol 100mcg inhaler PRN", "start": "1998-06-01", "end": null, "status": "active" },
+    { "name": "Iron Fumarate 300mg daily", "start": "2025-10-20", "end": null, "status": "active" },
+    { "name": "Prenatal vitamin", "start": "2025-09-15", "end": null, "status": "active" }
+  ],
+  "encounters": [
+    { "date": "2023-04-10", "reason": "Annual checkup, all stable" },
+    { "date": "2024-05-15", "reason": "Asthma review, well controlled" },
+    { "date": "2025-09-15", "reason": "Pregnancy confirmation, dating ultrasound arranged" },
+    { "date": "2025-10-20", "reason": "Fatigue, hemoglobin 108, iron deficiency diagnosed" },
+    { "date": "2025-12-05", "reason": "Prenatal follow-up, 16 weeks, iron improving" }
+  ],
+  "labs": [
+    { "test": "Hemoglobin", "date": "2025-10-20", "value": "108", "unit": "g/L" },
+    { "test": "Hemoglobin", "date": "2025-12-05", "value": "118", "unit": "g/L" },
+    { "test": "Ferritin", "date": "2025-10-20", "value": "12", "unit": "ug/L" },
+    { "test": "TSH", "date": "2025-09-15", "value": "1.8", "unit": "mIU/L" },
+    { "test": "Hemoglobin A1c", "date": "2024-05-15", "value": "5.2", "unit": "%" }
+  ],
+  "immunizations": [
+    { "vaccine": "Influenza", "date": "2024-10-01" },
+    { "vaccine": "Tdap", "date": "2025-09-20" },
+    { "vaccine": "COVID-19 Booster", "date": "2024-12-01" }
+  ],
+  "careGaps": [
+    { "gap": "Glucose tolerance test due", "due": "2026-01-15", "status": "pending", "detail": "24-28 week gestational diabetes screening." },
+    { "gap": "Anatomy ultrasound due", "due": "2026-01-05", "status": "pending", "detail": "18-22 week detailed anatomy scan." },
+    { "gap": "Asthma action plan review", "due": "2025-12-05", "status": "overdue", "detail": "Should be updated each trimester in pregnancy." },
+    { "gap": "Repeat hemoglobin due", "due": "2026-02-05", "status": "pending", "detail": "Check if iron supplementation is adequate." }
+  ]
+}

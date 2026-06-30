@@ -1,5 +1,37 @@
 from models import PatientWiki
 
+EMR_SYSTEM_PROMPT = """You are a clinical summarizer for primary care. You receive a patient's EMR data (conditions, medications, encounters, labs, immunizations, care gaps) and must generate a structured patient story and care plan.
+
+Output ONLY valid JSON, no markdown, no preamble:
+
+{
+  "patient_story": "A 2-3 paragraph narrative summary of this patient. Include: age, key conditions in chronological context, medication history with changes, lab trends, and notable events. Write in clinical language suitable for a family doctor. Example: 'Ms. Collins is a 60-year-old female with Type 2 Diabetes diagnosed in 2019. Her A1c has improved from 8.5 to 7.0 on Metformin. She developed diabetic neuropathy in 2024, managed with Gabapentin. She also has CKD Stage 3a with eGFR declining from 52 to 46 over 3 years. Her blood pressure is well-controlled on Ramipril 10mg and Atorvastatin 20mg.'",
+
+  "care_gaps": [
+    {
+      "gap": "name of the gap or overdue item",
+      "due": "when it was due or is next due",
+      "status": "overdue / pending / completed",
+      "detail": "brief explanation of why this matters"
+    }
+  ],
+
+  "wiki_update": {
+    "conditions": ["list of all active conditions"],
+    "medications": ["list of current medications with doses"],
+    "pending_tasks": [],
+    "resolved_tasks": [],
+    "narrative": "2-3 sentence summary of the patient story",
+    "history": "one paragraph cumulative medical history"
+  }
+}
+
+RULES:
+- patient_story must read like a clinical handoff, not a list
+- care_gaps should highlight overdue and soon-due items
+- Include lab trends where relevant
+- Mention medication changes (what was stopped and why)"""
+
 SYSTEM_PROMPT = """You are a clinical documentation assistant for an Ontario primary care visit.
 
 You receive a de-identified visit transcript and optionally the patient's prior visit memory (wiki).
@@ -143,6 +175,37 @@ Based on this visit: resolve completed tasks, add new findings, update medicatio
 {deidentified_transcript}
 
 Build the patient wiki fresh from this visit."""
+
+
+def build_emr_message(patient_data: dict) -> str:
+    sections = []
+
+    conds = patient_data.get("conditions", [])
+    if conds:
+        c_text = "\n  - ".join([f"{c.get('name','')} (onset: {c.get('onset','')}, {c.get('status','')})" for c in conds])
+        sections.append(f"CONDITIONS:\n  - {c_text}")
+
+    meds = patient_data.get("medications", [])
+    if meds:
+        m_text = "\n  - ".join([f"{m.get('name','')} ({m.get('status','')}) started {m.get('start','')}" + (f", ended {m.get('end','')}: {m.get('reason','')}" if m.get('end') else "") for m in meds])
+        sections.append(f"MEDICATIONS:\n  - {m_text}")
+
+    labs = patient_data.get("labs", [])
+    if labs:
+        l_text = "\n  - ".join([f"{l.get('test','')}: {l.get('value','')} {l.get('unit','')} ({l.get('date','')})" for l in labs])
+        sections.append(f"LABS:\n  - {l_text}")
+
+    gaps = patient_data.get("careGaps", [])
+    if gaps:
+        g_text = "\n  - ".join([f"{g.get('gap','')} - {g.get('detail','')} ({g.get('status','')})" for g in gaps])
+        sections.append(f"CARE GAPS:\n  - {g_text}")
+
+    encs = patient_data.get("encounters", [])
+    if encs:
+        e_text = "\n  - ".join([f"{e.get('date','')}: {e.get('reason','')}" for e in encs[-5:]])
+        sections.append(f"RECENT ENCOUNTERS:\n  - {e_text}")
+
+    return "\n\n".join(sections)
 
 
 def _format_wiki(wiki: PatientWiki) -> str:

@@ -7,65 +7,70 @@
     -apple-system,
     BlinkMacSystemFont,
     sans-serif;
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.5;
   font-weight: 400;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  --bg: #f5f7fb;
-  --bg-2: #e9eef8;
-  --surface: rgba(255, 255, 255, 0.78);
-  --surface-strong: #ffffff;
-  --surface-muted: rgba(244, 247, 252, 0.9);
-  --line: rgba(25, 33, 54, 0.1);
-  --line-strong: rgba(25, 33, 54, 0.18);
-  --text: #253046;
-  --text-soft: #5d6980;
-  --text-faint: #7c889d;
-  --accent: #0f766e;
-  --accent-2: #2457d6;
-  --accent-3: #f59e0b;
+
+  /* ── Core palette ─────────────────────────── */
+  --bg: #f0f4f9;
+  --bg-2: #e4eaf2;
+  --surface: rgba(255, 255, 255, 0.82);
+  --surface-solid: #ffffff;
+  --surface-muted: rgba(245, 248, 252, 0.92);
+  --line: rgba(0, 20, 41, 0.08);
+  --line-strong: rgba(0, 20, 41, 0.15);
+
+  /* ── Text ─────────────────────────────────── */
+  --text: #0b1e33;
+  --text-soft: #42526b;
+  --text-faint: #6b7a93;
+
+  /* ── Accents ──────────────────────────────── */
+  --accent: #0d7c6b;
+  --accent-2: #2652cc;
+  --accent-light: #eef3ff;
+  --accent-3: #d97706;
   --danger: #c2410c;
   --success: #15803d;
+
+  /* ── Shadows ──────────────────────────────── */
+  --shadow-sm: 0 1px 3px rgba(0, 20, 41, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 20, 41, 0.07);
   --shadow-lg:
-    0 24px 70px rgba(15, 23, 42, 0.12),
-    0 8px 24px rgba(15, 23, 42, 0.08);
-  --shadow-md: 0 16px 35px rgba(15, 23, 42, 0.08);
-  --radius-xl: 28px;
-  --radius-lg: 22px;
-  --radius-md: 16px;
-  --radius-sm: 12px;
+    0 12px 40px rgba(0, 20, 41, 0.10),
+    0 4px 12px rgba(0, 20, 41, 0.06);
+  --shadow-xl:
+    0 24px 60px rgba(0, 20, 41, 0.12),
+    0 8px 20px rgba(0, 20, 41, 0.06);
+
+  /* ── Radii ────────────────────────────────── */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
-html {
-  min-height: 100%;
-}
+html { min-height: 100%; }
 
 body {
   margin: 0;
   min-height: 100vh;
   color: var(--text);
   background:
-    radial-gradient(circle at top left, rgba(36, 87, 214, 0.18), transparent 28%),
-    radial-gradient(circle at top right, rgba(15, 118, 110, 0.14), transparent 22%),
-    linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+    radial-gradient(ellipse 80% 50% at 15% 0%, rgba(38, 82, 204, 0.08), transparent),
+    radial-gradient(ellipse 60% 40% at 85% 10%, rgba(13, 124, 107, 0.06), transparent),
+    linear-gradient(170deg, #f0f4f9 0%, #e4eaf2 100%);
+  background-attachment: fixed;
 }
 
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
+button, input, select, textarea { font: inherit; }
 
-a {
-  color: inherit;
-}
+a { color: inherit; }
 
 #root {
   min-height: 100vh;

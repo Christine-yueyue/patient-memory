@@ -2,7 +2,7 @@ import { useState } from 'react';
 import transcripts from '../data/transcripts';
 import { deidentify } from '../lib/deidentify';
 
-const TranscriptInput = ({ onProcess, onTranscriptChange }) => {
+const TranscriptInput = ({ onProcess, onTranscriptChange, patientName }) => {
   const [selectedVisit, setSelectedVisit] = useState('');
   const [pastedTranscript, setPastedTranscript] = useState('');
   const [deidMap, setDeidMap] = useState({});
@@ -17,7 +17,7 @@ const TranscriptInput = ({ onProcess, onTranscriptChange }) => {
     setPastedTranscript('');
 
     if (visit) {
-      const patientNames = ['Martha Collins'];
+      const patientNames = patientName ? [patientName] : ['Martha Collins'];
       const deidResult = deidentify(transcripts[visit], patientNames);
       setDeidMap(deidResult.map);
       onTranscriptChange(deidResult.clean);

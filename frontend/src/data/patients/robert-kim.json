@@ -1,0 +1,57 @@
+{
+  "id": "pt-d4e5f6",
+  "name": "Robert Kim",
+  "dob": "1969-08-23",
+  "gender": "male",
+  "conditions": [
+    { "code": "I50.9", "name": "Heart Failure (HFpEF)", "onset": "2021-11-03", "status": "active" },
+    { "code": "I10", "name": "Hypertension", "onset": "2015-04-12", "status": "active" },
+    { "code": "E11.9", "name": "Type 2 Diabetes Mellitus", "onset": "2018-07-20", "status": "active" },
+    { "code": "N18.4", "name": "CKD Stage 3b", "onset": "2022-01-15", "status": "active" },
+    { "code": "I48.91", "name": "Atrial Fibrillation (paroxysmal)", "onset": "2022-06-10", "status": "active" },
+    { "code": "Z95.1", "name": "Coronary Artery Disease (stented)", "onset": "2020-09-08", "status": "active" }
+  ],
+  "medications": [
+    { "name": "Ramipril 5mg", "start": "2015-04-12", "end": "2021-12-01", "status": "stopped", "reason": "Switched to Sacubitril/Valsartan" },
+    { "name": "Sacubitril/Valsartan 49/51mg", "start": "2021-12-01", "end": null, "status": "active" },
+    { "name": "Metformin 1000mg", "start": "2018-07-20", "end": null, "status": "active" },
+    { "name": "Dapagliflozin 10mg", "start": "2022-01-15", "end": null, "status": "active" },
+    { "name": "Furosemide 40mg", "start": "2021-11-03", "end": null, "status": "active" },
+    { "name": "Apixaban 5mg", "start": "2022-06-10", "end": null, "status": "active" },
+    { "name": "Atorvastatin 40mg", "start": "2020-09-08", "end": null, "status": "active" },
+    { "name": "Carvedilol 6.25mg", "start": "2021-11-03", "end": null, "status": "active" }
+  ],
+  "encounters": [
+    { "date": "2015-04-12", "reason": "Hypertension diagnosis, started Ramipril" },
+    { "date": "2018-07-20", "reason": "Diabetes diagnosis, started Metformin" },
+    { "date": "2020-09-08", "reason": "Post-PCI follow-up after STEMI" },
+    { "date": "2021-11-03", "reason": "SOB and edema, HFpEF diagnosed" },
+    { "date": "2022-01-15", "reason": "CKD monitoring, eGFR 38, started Dapagliflozin" },
+    { "date": "2022-06-10", "reason": "Palpitations, AFib diagnosed, started Apixaban" },
+    { "date": "2023-03-22", "reason": "Cardiology follow-up, stable on current regimen" },
+    { "date": "2024-02-14", "reason": "Heart failure check, weight stable, no admissions" },
+    { "date": "2024-09-30", "reason": "Diabetes review, A1c 6.8, CKD stable" },
+    { "date": "2025-05-12", "reason": "Annual heart failure review, echo stable" }
+  ],
+  "labs": [
+    { "test": "eGFR", "date": "2022-01-15", "value": "38", "unit": "mL/min" },
+    { "test": "eGFR", "date": "2023-03-22", "value": "36", "unit": "mL/min" },
+    { "test": "eGFR", "date": "2024-09-30", "value": "34", "unit": "mL/min" },
+    { "test": "eGFR", "date": "2025-05-12", "value": "33", "unit": "mL/min" },
+    { "test": "HbA1c", "date": "2024-09-30", "value": "6.8", "unit": "%" },
+    { "test": "BNP", "date": "2025-05-12", "value": "185", "unit": "pg/mL" },
+    { "test": "Potassium", "date": "2024-09-30", "value": "4.6", "unit": "mmol/L" },
+    { "test": "LDL", "date": "2024-09-30", "value": "1.8", "unit": "mmol/L" }
+  ],
+  "immunizations": [
+    { "vaccine": "Influenza", "date": "2024-10-20" },
+    { "vaccine": "Pneumococcal (Prevnar 20)", "date": "2024-01-10" },
+    { "vaccine": "COVID-19 Booster", "date": "2024-11-15" }
+  ],
+  "careGaps": [
+    { "gap": "eGFR check overdue", "due": "2025-11-12", "status": "overdue", "detail": "Last checked May 2025. Due every 6 months for CKD Stage 3b." },
+    { "gap": "Potassium check overdue", "due": "2025-11-12", "status": "overdue", "detail": "Must monitor q6mo on Sacubitril/Valsartan + Dapagliflozin." },
+    { "gap": "Echocardiogram due", "due": "2026-05-12", "status": "pending", "detail": "Annual echo for HFpEF follow-up." },
+    { "gap": "INR not applicable", "due": null, "status": "not_applicable", "detail": "On Apixaban, no INR monitoring needed." }
+  ]
+}

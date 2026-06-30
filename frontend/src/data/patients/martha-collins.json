@@ -1,0 +1,53 @@
+{
+  "id": "pt-a1b2c3",
+  "name": "Martha Collins",
+  "dob": "1966-01-15",
+  "gender": "female",
+  "conditions": [
+    { "code": "E11.9", "name": "Type 2 Diabetes Mellitus", "onset": "2019-03-12", "status": "active" },
+    { "code": "I10", "name": "Hypertension", "onset": "2020-06-05", "status": "active" },
+    { "code": "E78.5", "name": "Hyperlipidemia", "onset": "2020-06-05", "status": "active" },
+    { "code": "E11.42", "name": "Diabetic Neuropathy", "onset": "2024-08-22", "status": "active" },
+    { "code": "N18.3", "name": "CKD Stage 3a", "onset": "2023-11-10", "status": "active" }
+  ],
+  "medications": [
+    { "name": "Metformin 500mg", "start": "2019-03-12", "end": "2021-06-15", "status": "stopped", "reason": "Increased to 1000mg" },
+    { "name": "Metformin 1000mg", "start": "2021-06-15", "end": null, "status": "active" },
+    { "name": "Ramipril 10mg", "start": "2020-06-05", "end": null, "status": "active" },
+    { "name": "Atorvastatin 20mg", "start": "2020-06-05", "end": null, "status": "active" },
+    { "name": "Gabapentin 300mg", "start": "2024-08-22", "end": null, "status": "active" }
+  ],
+  "encounters": [
+    { "date": "2019-03-12", "reason": "New patient intake, elevated blood glucose" },
+    { "date": "2020-06-05", "reason": "Annual checkup, elevated BP detected" },
+    { "date": "2021-06-15", "reason": "Diabetes follow-up, A1c 8.5, increased Metformin" },
+    { "date": "2022-04-20", "reason": "Annual review, A1c 7.8, BP 138/85" },
+    { "date": "2023-01-10", "reason": "Lab review, eGFR 52, CKD diagnosed" },
+    { "date": "2023-11-10", "reason": "CKD monitoring, nephrology referral discussed" },
+    { "date": "2024-04-05", "reason": "Diabetes check, A1c 7.3, started on Jardiance discussion" },
+    { "date": "2024-08-22", "reason": "Neuropathy symptoms, started Gabapentin" },
+    { "date": "2025-03-15", "reason": "Annual comprehensive visit, overall stable" },
+    { "date": "2025-10-28", "reason": "Follow-up, A1c 7.0, BP controlled, preventive care" }
+  ],
+  "labs": [
+    { "test": "HbA1c", "date": "2021-06-15", "value": "8.5", "unit": "%" },
+    { "test": "HbA1c", "date": "2022-04-20", "value": "7.8", "unit": "%" },
+    { "test": "HbA1c", "date": "2024-04-05", "value": "7.3", "unit": "%" },
+    { "test": "HbA1c", "date": "2025-10-28", "value": "7.0", "unit": "%" },
+    { "test": "eGFR", "date": "2023-01-10", "value": "52", "unit": "mL/min" },
+    { "test": "eGFR", "date": "2024-04-05", "value": "48", "unit": "mL/min" },
+    { "test": "eGFR", "date": "2025-10-28", "value": "46", "unit": "mL/min" },
+    { "test": "LDL", "date": "2025-10-28", "value": "2.4", "unit": "mmol/L" },
+    { "test": "BP", "date": "2025-10-28", "value": "128/76", "unit": "mmHg" }
+  ],
+  "immunizations": [
+    { "vaccine": "Influenza", "date": "2024-10-15" },
+    { "vaccine": "COVID-19 Booster", "date": "2024-11-01" }
+  ],
+  "careGaps": [
+    { "gap": "Mammogram overdue", "due": "2024-01-15", "status": "overdue", "detail": "Last mammogram 2021. Due annually after 50." },
+    { "gap": "Flu vaccine 2025 season", "due": "2025-10-01", "status": "overdue", "detail": "Not yet received for this season." },
+    { "gap": "eGFR check overdue", "due": "2026-04-28", "status": "pending", "detail": "Last checked Oct 2025. Due every 6 months for CKD." },
+    { "gap": "Foot exam", "due": "2025-10-28", "status": "overdue", "detail": "Annual foot exam for diabetic neuropathy not documented." }
+  ]
+}

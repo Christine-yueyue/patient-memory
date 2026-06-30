@@ -1,42 +1,10 @@
-import { useState, useEffect } from 'react';
-import TranscriptInput from './components/TranscriptInput';
-import NotePane from './components/NotePane';
-import BillingPane from './components/BillingPane';
-import TasksPane from './components/TasksPane';
-import PatientSummaryPane from './components/PatientSummaryPane';
-import InsightsPane from './components/InsightsPane';
-import VisitTimelinePane from './components/VisitTimelinePane';
+import { useState } from 'react';
+import { patients as staticPatients } from './data/patients';
+import PatientSelector from './components/PatientSelector';
 import PatientStoryPane from './components/PatientStoryPane';
-import PrescriptionsPane from './components/PrescriptionsPane';
-import RemindersPane from './components/RemindersPane';
-import {
-  loadPatientMemory,
-  savePatientMemory,
-  loadPatientVisits,
-  savePatientVisit,
-} from './lib/storage';
+import CarePlanPane from './components/CarePlanPane';
+import Dashboard from './components/Dashboard';
 import './App.css';
-
-const PATIENT_ID = 'pt-a1b2c3';
-
-function IntroCard() {
-  return (
-    <div className="placeholder pane">
-      <h2>From transcript to care continuity</h2>
-      <p>
-        Select a sample visit or paste your own de-identified transcript to
-        generate the note, billing suggestions, follow-up tasks, and updated
-        patient memory.
-      </p>
-      <div className="placeholder-grid">
-        <div className="placeholder-chip">Clinical note</div>
-        <div className="placeholder-chip">Billing review</div>
-        <div className="placeholder-chip">Follow-up tasks</div>
-        <div className="placeholder-chip">Memory update</div>
-      </div>
-    </div>
-  );
-}
 
 function calcAge(dob) {
   if (!dob) return null;
@@ -45,243 +13,169 @@ function calcAge(dob) {
   return isNaN(age) || age < 0 ? null : age;
 }
 
+function fmtDate(dob) {
+  if (!dob) return '';
+  return new Date(dob + 'T00:00:00').toLocaleDateString('en-CA', {
+    year: 'numeric', month: 'short', day: 'numeric',
+  });
+}
+
+function loadUploaded() {
+  try {
+    const raw = localStorage.getItem('uploadedPatients');
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
 function App() {
-  const [transcript, setTranscript] = useState('');
-  const [deidMap, setDeidMap] = useState({});
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [allPatients, setAllPatients] = useState(() => [...staticPatients, ...loadUploaded()]);
+  const [selectedPatientId, setSelectedPatientId] = useState('');
+  const [patientData, setPatientData] = useState(null);
+  const [patientStory, setPatientStory] = useState('');
+  const [careGaps, setCareGaps] = useState([]);
+  const [storyLoading, setStoryLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [patientWiki, setPatientWiki] = useState(() => loadPatientMemory(PATIENT_ID));
-  const [visitTimeline, setVisitTimeline] = useState(() => loadPatientVisits(PATIENT_ID));
-  const [visitCount, setVisitCount] = useState(() =>
-    loadPatientVisits(PATIENT_ID).length || (loadPatientMemory(PATIENT_ID) ? 1 : 0)
-  );
-  const [visitRenderKey, setVisitRenderKey] = useState(0);
-  const [patientId] = useState(PATIENT_ID);
 
-  // Patient demographics — stored locally, never sent to AI
-  const [patientName, setPatientName] = useState('Martha Collins');
-  const [patientDOB, setPatientDOB] = useState('1966-01-15');
-  const [patientIdNum, setPatientIdNum] = useState('HC-4823917650');
-  const [editingDemo, setEditingDemo] = useState(false);
-  const [demoSnapshot, setDemoSnapshot] = useState(null);
+  const findPatient = (id) => allPatients.find(p => p.id === id) || null;
+  const currentPatient = patientData || findPatient(selectedPatientId);
+  const patientAge = currentPatient ? calcAge(currentPatient.dob) : null;
 
-  function startEditing() {
-    setDemoSnapshot({ patientName, patientDOB, patientIdNum });
-    setEditingDemo(true);
-  }
-  function cancelEditing() {
-    if (demoSnapshot) {
-      setPatientName(demoSnapshot.patientName);
-      setPatientDOB(demoSnapshot.patientDOB);
-      setPatientIdNum(demoSnapshot.patientIdNum);
-    }
-    setEditingDemo(false);
-  }
-  function doneEditing() {
-    setDemoSnapshot(null);
-    setEditingDemo(false);
-  }
-
-  const patientAge = calcAge(patientDOB);
-  const deidEntries = Object.entries(deidMap);
-  const hasResult = Boolean(result);
-
-  useEffect(() => {
-    if (patientWiki) {
-      savePatientMemory(patientId, patientWiki);
-    }
-  }, [patientWiki, patientId]);
-
-  const handleProcessVisit = async (rawTranscript, deidMapFromInput) => {
-    setLoading(true);
+  const handlePatientSelect = async (patientId) => {
+    setSelectedPatientId(patientId);
     setError(null);
-    setResult(null);
+
+    if (!patientId) {
+      setPatientData(null);
+      setPatientStory('');
+      setCareGaps([]);
+      return;
+    }
+
+    const patient = findPatient(patientId);
+    if (!patient) return;
+    setPatientData(patient);
+    setStoryLoading(true);
 
     try {
-      setDeidMap(deidMapFromInput);
-
-      const response = await fetch('http://localhost:3001/api/process', {
+      const response = await fetch('http://localhost:3001/api/load-emr', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          transcript: rawTranscript,
-          patient_names: [],
-          patient_wiki: patientWiki,
-          patient_session_id: patientId,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patient),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to process visit');
-      }
+      if (!response.ok) throw new Error('Failed to load patient story');
 
       const data = await response.json();
-      setResult(data);
-      setPatientWiki(data.wiki_update);
-      const nextVisitNumber = visitTimeline.length + 1;
-      const visitEntry = {
-        id: `${Date.now()}-${nextVisitNumber}`,
-        label: `Visit ${nextVisitNumber}`,
-        timestampLabel: new Date().toLocaleDateString(),
-        summary: data.patient_summary || 'Summary unavailable.',
-        insights: data.insights || [],
-        conditions: data.wiki_update?.conditions || [],
-        medications: data.wiki_update?.medications || [],
-        tasks: data.tasks || [],
-      };
-      setVisitTimeline((prev) => [...prev, visitEntry]);
-      savePatientVisit(patientId, visitEntry);
-      setVisitCount((prev) => prev + 1);
-      setVisitRenderKey((prev) => prev + 1);
+      setPatientStory(data.patient_story);
+      setCareGaps(data.care_gaps || []);
     } catch (err) {
-      setError(err.message);
+      setPatientStory(
+        `${patient.name}, age ${patientAge || ''}. ${patient.conditions.length} active conditions. ${
+          patient.medications.filter(m => m.status === 'active').length
+        } current medications.`
+      );
+      setCareGaps(patient.careGaps || []);
     } finally {
-      setLoading(false);
+      setStoryLoading(false);
     }
   };
 
-  const handleTaskUpdate = (index, updates) => {
-    if (!result || !result.tasks) return;
+  const handleUploadEmr = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    const updatedTasks = [...result.tasks];
-    updatedTasks[index] = {
-      ...updatedTasks[index],
-      ...updates,
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        if (!data.name || !data.dob) {
+          alert('Invalid EMR format. File must include patient name and dob.');
+          return;
+        }
+        const newPatient = {
+          ...data,
+          id: data.id || `pt-upload-${Date.now()}`,
+          careGaps: data.careGaps || data.care_gaps || [],
+        };
+        setAllPatients(prev => {
+          const updated = [...prev, newPatient];
+          const uploaded = updated.filter(p => p.id.startsWith('pt-upload-'));
+          localStorage.setItem('uploadedPatients', JSON.stringify(uploaded));
+          return updated;
+        });
+        handlePatientSelect(newPatient.id);
+      } catch (err) {
+        alert('Failed to parse EMR file. Please upload a valid JSON file.');
+      }
     };
-
-    setResult((prev) => ({
-      ...prev,
-      tasks: updatedTasks,
-    }));
-  };
-
-  const handleTaskDelete = (index) => {
-    if (!result || !result.tasks) return;
-
-    const updatedTasks = [...result.tasks];
-    updatedTasks.splice(index, 1);
-
-    setResult((prev) => ({
-      ...prev,
-      tasks: updatedTasks,
-    }));
-  };
-
-  const patientSummaryText = result?.patient_summary || '';
-  const patientShareText = [
-    patientSummaryText || 'Patient summary not available yet.',
-    result?.tasks?.length
-      ? `Next steps:\n${result.tasks.map((task) => `- ${task.task} (${task.due})`).join('\n')}`
-      : '',
-  ]
-    .filter(Boolean)
-    .join('\n\n');
-
-  const handleCopySummary = async () => {
-    if (navigator.clipboard && patientShareText) {
-      await navigator.clipboard.writeText(patientShareText);
-    }
+    reader.readAsText(file);
+    e.target.value = '';
   };
 
   return (
     <div className="app-shell">
-      <nav className="topbar">
-        <div className="topbar-brand">
-          <span className="topbar-logo">⚕</span>
-          <span className="topbar-name">ContinuCare Assistant</span>
-        </div>
-        <span className="topbar-tag">Ontario Primary Care</span>
-      </nav>
-
-      <header className="patient-banner-bar">
-
-        <div className="patient-card">
-          {editingDemo ? (
-            <div className="patient-demo-edit">
-              <label>Name<input value={patientName} onChange={e => setPatientName(e.target.value)} /></label>
-              <label>Date of Birth<input type="date" value={patientDOB} onChange={e => setPatientDOB(e.target.value)} /></label>
-              <label>Patient ID<input value={patientIdNum} onChange={e => setPatientIdNum(e.target.value)} /></label>
-              <div className="demo-edit-actions">
-                <button className="review-button" onClick={doneEditing}>Done</button>
-                <button className="review-button muted" onClick={cancelEditing}>Cancel</button>
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className="patient-banner-name">
-                {patientName || '—'}
-                <button className="btn-edit-demo" onClick={startEditing}>Edit</button>
-              </div>
-              <div className="patient-banner-meta">
-                <span><strong>DOB</strong> {patientDOB ? new Date(patientDOB + 'T00:00:00').toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' }) : '—'}</span>
-                {patientAge && <span><strong>Age</strong> {patientAge}</span>}
-                <span><strong>ID</strong> {patientIdNum || '—'}</span>
-                <span className="patient-visit-badge">Visit #{visitCount + 1}{visitTimeline.length > 0 ? ` · ${visitTimeline.length} prior` : ' · New patient'}</span>
-              </div>
-              {(patientWiki?.conditions?.length > 0 || patientWiki?.medications?.length > 0) && (
-                <div className="patient-banner-clinical">
-                  {patientWiki?.conditions?.length > 0 && (
-                    <span className="banner-clinical-row"><strong>Conditions</strong> {patientWiki.conditions.join(' · ')}</span>
-                  )}
-                  {patientWiki?.medications?.length > 0 && (
-                    <span className="banner-clinical-row"><strong>Medications</strong> {patientWiki.medications.join(' · ')}</span>
-                  )}
-                </div>
-              )}
-            </>
-          )}
-        </div>
+      <header className="topbar">
+        <span className="topbar-brand">
+          <span className="topbar-dot" />
+          ContinuCare
+        </span>
+        <span className="topbar-tag">Continuity of Care</span>
       </header>
 
-      <div className="main-content">
-
-        <div className="left-panel">
-          <TranscriptInput
-            onProcess={handleProcessVisit}
-            onTranscriptChange={setTranscript}
+      <div className="main-layout">
+        <aside className="sidebar">
+          <PatientSelector
+            patients={allPatients}
+            selectedPatientId={selectedPatientId}
+            onPatientSelect={handlePatientSelect}
+            loading={storyLoading}
           />
-        </div>
+        </aside>
 
-        <div className="right-panel">
-          {hasResult ? (
+        <main className="content">
+          {storyLoading && <div className="loading">Loading patient story...</div>}
+
+          {!storyLoading && selectedPatientId && currentPatient && (
             <>
-              <PatientSummaryPane
-                patientSummary={result.patient_summary}
-                tasks={result.tasks}
-                patientReminders={result.patient_reminders}
-                onCopy={handleCopySummary}
+              <div className="patient-detail">
+                <h1>{currentPatient.name}</h1>
+                <div className="patient-meta">
+                  <span className="meta-chip">DOB {fmtDate(currentPatient.dob)}</span>
+                  <span className="meta-chip">Age {patientAge}</span>
+                  <span className="meta-chip">ID {currentPatient.id}</span>
+                </div>
+                <div className="patient-info-line">
+                  <strong>Conditions</strong>
+                  {currentPatient.conditions?.map(c => c.name).join(', ') || '—'}
+                </div>
+                <div className="patient-info-line">
+                  <strong>Medications</strong>
+                  {currentPatient.medications?.filter(m => m.status === 'active').map(m => m.name).join(', ') || '—'}
+                </div>
+              </div>
+
+              <PatientStoryPane patientStory={patientStory} loading={false} />
+              <CarePlanPane
+                tasks={careGaps.map(g => ({
+                  task: g.gap,
+                  due: g.due || 'asap',
+                  status: g.status,
+                }))}
               />
-              <PrescriptionsPane prescriptions={result.prescriptions} />
-              <RemindersPane
-                patientReminders={result.patient_reminders}
-                doctorReminders={result.doctor_reminders}
-              />
-              <NotePane key={`note-${visitRenderKey}`} note={result.note} />
-              <BillingPane
-                key={`billing-${visitRenderKey}`}
-                billingItems={result.billing}
-              />
-              <InsightsPane insights={result.insights} />
-              <VisitTimelinePane timeline={visitTimeline} />
-              <PatientStoryPane wiki={patientWiki} />
             </>
-          ) : (
-            <IntroCard />
           )}
-        </div>
+
+          {!storyLoading && !selectedPatientId && (
+            <Dashboard
+              patients={allPatients}
+              onPatientSelect={handlePatientSelect}
+              onUploadEmr={handleUploadEmr}
+            />
+          )}
+        </main>
       </div>
 
-      {error && <div className="error-message">Alert: {error}</div>}
-
-      {loading && (
-        <div className="loading-indicator">
-          Processing visit <span className="loading-dots">...</span>
-        </div>
-      )}
+      {error && <div className="error-bar">Error: {error}</div>}
     </div>
   );
 }

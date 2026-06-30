@@ -1,4 +1,4 @@
-const MemoryTimelinePane = ({ timeline }) => {
+const VisitTimelinePane = ({ timeline }) => {
   if (!timeline || timeline.length === 0) return null;
 
   return (
@@ -25,4 +25,4 @@ const MemoryTimelinePane = ({ timeline }) => {
   );
 };
 
-export default MemoryTimelinePane;
+export default VisitTimelinePane;
